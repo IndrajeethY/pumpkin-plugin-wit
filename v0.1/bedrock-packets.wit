@@ -2,10 +2,17 @@ package pumpkin:plugin@0.1.0;
 
 interface bedrock-packets {
   use uuid.{ uuid };
+  record s-actor-event {
+    entity-runtime-id: s32,
+    event-type: string,
+    event-data: s32,
+    fire-at-position: option<tuple<f64, f64, f64>>,
+  }
   record s-animate {
     action: string,
     runtime-entity-id: string,
-    boat-rowing-time: option<f32>,
+    data: f32,
+    swing-source: option<string>,
   }
   record s-client-cache-status {
     cache-supported: bool,
@@ -24,10 +31,29 @@ interface bedrock-packets {
     container-type: u8,
     server-initiated: bool,
   }
+  record s-emote {
+    runtime-entity-id: string,
+    emote-id: string,
+    emote-length: s32,
+    xuid: string,
+    platform-id: string,
+    %flags: u8,
+  }
+  record s-emote-list {
+    runtime-entity-id: string,
+    emote-pieces: list<uuid>,
+  }
   record s-interaction {
     action: string,
     target-runtime-id: string,
     position: option<tuple<f64, f64, f64>>,
+  }
+  record s-inventory-transaction {
+    legacy-request-id: s32,
+    legacy-set-item-slots: list<string>,
+    actions: list<string>,
+    transaction-type: s32,
+    transaction-data: string,
   }
   record s-loading-screen {
     status: s32,
@@ -124,6 +150,40 @@ interface bedrock-packets {
     platform-chat-id: string,
     filtered-message: option<string>,
   }
+  record c-add-actor {
+    entity-unique-id: string,
+    entity-runtime-id: string,
+    entity-type: string,
+    position: tuple<f64, f64, f64>,
+    velocity: tuple<f64, f64, f64>,
+    pitch: f32,
+    yaw: f32,
+    head-yaw: f32,
+    body-yaw: f32,
+    attributes: list<string>,
+    metadata: string,
+    synced-properties: string,
+    links: list<string>,
+  }
+  record c-add-player {
+    uuid: uuid,
+    username: string,
+    entity-runtime-id: string,
+    platform-chat-id: string,
+    position: tuple<f64, f64, f64>,
+    velocity: tuple<f64, f64, f64>,
+    pitch: f32,
+    yaw: f32,
+    head-yaw: f32,
+    held-item: string,
+    game-mode: s32,
+    metadata: string,
+    properties: string,
+    ability-data: string,
+    links: list<string>,
+    device-id: string,
+    build-platform: s32,
+  }
   record c-available-commands {
     enum-values: list<string>,
     chained-subcommand-values: list<string>,
@@ -191,6 +251,24 @@ interface bedrock-packets {
     form-id: s32,
     form-data: string,
   }
+  record c-move-actor-absolute {
+    entity-runtime-id: string,
+    %flags: u8,
+    position: tuple<f64, f64, f64>,
+    pitch: u8,
+    yaw: u8,
+    head-yaw: u8,
+  }
+  record c-move-actor-delta {
+    entity-runtime-id: string,
+    %flags: s32,
+    x: f32,
+    y: f32,
+    z: f32,
+    pitch: u8,
+    yaw: u8,
+    head-yaw: u8,
+  }
   record c-move-player {
     player-runtime-id: string,
     position: tuple<f64, f64, f64>,
@@ -200,6 +278,8 @@ interface bedrock-packets {
     mode: u8,
     on-ground: bool,
     riding-runtime-id: string,
+    teleport-cause: s32,
+    teleport-source-entity-type: s32,
     tick: string,
   }
   record c-network-chunk-publisher-update {
@@ -218,6 +298,10 @@ interface bedrock-packets {
     selected-slot: s32,
     container-id: u8,
     should-select-block: bool,
+  }
+  record c-player-list {
+    action: u8,
+    entries: list<string>,
   }
   record c-connected-pong {
     ping: s64,
@@ -253,6 +337,9 @@ interface bedrock-packets {
     server-guid: s64,
     magic: string,
     server-id: string,
+  }
+  record c-remove-actor {
+    entity-unique-id: string,
   }
   record c-resource-pack-stack-packet {
     resource-pack-required: bool,
@@ -361,12 +448,22 @@ interface bedrock-packets {
     attributes: list<string>,
     player-tick: string,
   }
+  record c-update-block {
+    position: tuple<s32, s32, s32>,
+    block-runtime-id: s32,
+    %flags: s32,
+    layer: s32,
+  }
   variant serverbound-packet {
+    s-actor-event(s-actor-event),
     s-animate(s-animate),
     s-client-cache-status(s-client-cache-status),
     s-command-request(s-command-request),
     s-container-close(s-container-close),
+    s-emote(s-emote),
+    s-emote-list(s-emote-list),
     s-interaction(s-interaction),
+    s-inventory-transaction(s-inventory-transaction),
     s-loading-screen(s-loading-screen),
     s-login(s-login),
     s-modal-form-response(s-modal-form-response),
@@ -386,6 +483,8 @@ interface bedrock-packets {
     s-text(s-text),
   }
   variant clientbound-packet {
+    c-add-actor(c-add-actor),
+    c-add-player(c-add-player),
     c-available-commands(c-available-commands),
     c-boss-event(c-boss-event),
     c-chunk-radius-update(c-chunk-radius-update),
@@ -399,16 +498,20 @@ interface bedrock-packets {
     c-level-chunk(c-level-chunk),
     c-level-event(c-level-event),
     c-modal-form-request(c-modal-form-request),
+    c-move-actor-absolute(c-move-actor-absolute),
+    c-move-actor-delta(c-move-actor-delta),
     c-move-player(c-move-player),
     c-network-chunk-publisher-update(c-network-chunk-publisher-update),
     c-network-settings(c-network-settings),
     c-player-hotbar(c-player-hotbar),
+    c-player-list(c-player-list),
     c-connected-pong(c-connected-pong),
     c-connection-request-accepted(c-connection-request-accepted),
     c-incompatible-protocol-version(c-incompatible-protocol-version),
     c-open-connection-reply1(c-open-connection-reply1),
     c-open-connection-reply2(c-open-connection-reply2),
     c-unconnected-pong(c-unconnected-pong),
+    c-remove-actor(c-remove-actor),
     c-resource-pack-stack-packet(c-resource-pack-stack-packet),
     c-resource-packs-info(c-resource-packs-info),
     c-set-display-objective(c-set-display-objective),
@@ -424,5 +527,6 @@ interface bedrock-packets {
     c-transfer(c-transfer),
     c-update-abilities(c-update-abilities),
     c-update-attributes(c-update-attributes),
+    c-update-block(c-update-block),
   }
 }

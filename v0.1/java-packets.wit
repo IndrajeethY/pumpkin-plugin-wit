@@ -15,9 +15,9 @@ interface java-packets {
     message: string,
     timestamp: s64,
     salt: s64,
-    signature: option<list<list<u8>>>,
+    signature: option<list<u8>>,
     message-count: s32,
-    acknowledged: list<list<u8>>,
+    acknowledged: list<u8>,
     checksum: u8,
   }
   record s-chunk-batch {
@@ -62,15 +62,15 @@ interface java-packets {
   }
   record s-cookie-response {
     key: string,
-    payload: option<list<list<u8>>>,
+    payload: option<list<u8>>,
   }
   record s-custom-click-action {
     action-id: string,
-    payload: option<list<list<u8>>>,
+    payload: option<list<u8>>,
   }
   record s-custom-payload {
     channel: string,
-    data: list<list<u8>>,
+    data: list<u8>,
   }
   record s-interact {
     entity-id: s32,
@@ -147,8 +147,8 @@ interface java-packets {
   record s-player-session {
     session-id: uuid,
     expires-at: s64,
-    public-key: list<list<u8>>,
-    key-signature: list<list<u8>>,
+    public-key: list<u8>,
+    key-signature: list<u8>,
   }
   record s-recipe-book-change-settings {
     book-type: s32,
@@ -221,7 +221,7 @@ interface java-packets {
   record c-block-entity-data {
     location: tuple<s32, s32, s32>,
     r-type: s32,
-    nbt-data: list<list<u8>>,
+    nbt-data: list<u8>,
   }
   record c-block-event {
     location: tuple<s32, s32, s32>,
@@ -262,10 +262,10 @@ interface java-packets {
     id: s32,
     start: s32,
     length: s32,
-    matches: list<list<string>>,
+    matches: list<string>,
   }
   record c-commands {
-    nodes: list<list<string>>,
+    nodes: list<string>,
     root-node-index: s32,
   }
   record c-play-cookie-request {
@@ -301,7 +301,7 @@ interface java-packets {
   }
   record c-set-entity-metadata {
     entity-id: s32,
-    metadata: list<list<u8>>,
+    metadata: list<u8>,
   }
   record c-entity-position-sync {
     entity-id: s32,
@@ -442,11 +442,11 @@ interface java-packets {
     global-index: s32,
     sender: uuid,
     index: s32,
-    message-signature: option<list<list<u8>>>,
+    message-signature: option<list<u8>>,
     message: string,
     timestamp: s64,
     salt: s64,
-    previous-messages: list<list<string>>,
+    previous-messages: list<string>,
     unsigned-content: option<string>,
     filter-type: string,
     chat-type: s32,
