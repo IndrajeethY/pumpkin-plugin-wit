@@ -481,6 +481,7 @@ interface bedrock-packets {
     s-resource-pack-response(s-resource-pack-response),
     s-set-local-player-as-initialized(s-set-local-player-as-initialized),
     s-text(s-text),
+    unknown,
   }
   variant clientbound-packet {
     c-add-actor(c-add-actor),
@@ -528,5 +529,6 @@ interface bedrock-packets {
     c-update-abilities(c-update-abilities),
     c-update-attributes(c-update-attributes),
     c-update-block(c-update-block),
+    unknown,
   }
 }

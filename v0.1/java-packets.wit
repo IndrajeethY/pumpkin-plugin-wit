@@ -758,6 +758,7 @@ interface java-packets {
     s-update-sign(s-update-sign),
     s-use-item(s-use-item),
     s-use-item-on(s-use-item-on),
+    unknown,
   }
   variant clientbound-packet {
     c-acknowledge-block-change(c-acknowledge-block-change),
@@ -860,5 +861,6 @@ interface java-packets {
     c-update-objectives(c-update-objectives),
     c-update-score(c-update-score),
     c-world-event(c-world-event),
+    unknown,
   }
 }

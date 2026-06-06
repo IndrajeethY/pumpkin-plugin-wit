@@ -11,11 +11,13 @@ interface event {
     variant serverbound-packet {
         java(java-serverbound-packet),
         bedrock(bedrock-serverbound-packet),
+        unknown,
     }
 
     variant clientbound-packet {
         java(java-clientbound-packet),
         bedrock(bedrock-clientbound-packet),
+        unknown,
     }
 
     enum event-priority {
@@ -306,12 +308,16 @@ interface event {
     record packet-received-event-data {
         player: player,
         packet: serverbound-packet,
+        packet-id: s32,
+        raw-payload: list<u8>,
         cancelled: bool
     }
 
     record packet-sent-event-data {
         player: player,
         packet: clientbound-packet,
+        packet-id: s32,
+        raw-payload: list<u8>,
         cancelled: bool
     }
 
