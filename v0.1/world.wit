@@ -1,12 +1,14 @@
 interface %world {
-    use common.{position, entity-pose, block-pos};
-    use block-entity.{block-entity, command-block-entity, block-entity-type};
-    use text.{text-component};
-    use scoreboard.{scoreboard};
-    use particles.{particle};
-    use sounds.{sound};
-    use entity-types.{entity-type};
-    use biomes.{biome};
+use common.{position, entity-pose, block-pos};
+use block-entity.{block-entity, command-block-entity, block-entity-type};
+use text.{text-component};
+use scoreboard.{scoreboard};
+use particles.particle;
+use sounds.{sound, sound-category};
+use entity-types.entity-type;
+use biomes.biome;
+use uuid.uuid;
+
     use uuid.{uuid};
 
     /// Defines how a block reacts when pushed by a piston.
@@ -255,6 +257,7 @@ interface %world {
         get-nearby-entities: func(x: f64, y: f64, z: f64) -> list<entity>;
 
         get-vehicle: func() -> option<entity>;
+        set-vehicle: func(vehicle: option<entity>);
         get-passengers: func() -> list<entity>;
         add-passenger: func(passenger: entity);
         remove-passenger: func(passenger: entity);
@@ -279,6 +282,74 @@ interface %world {
         face: block-direction,
     }
 
+    resource chunk {
+        /// Gets the chunk's X coordinate.
+        get-x: func() -> s32;
+
+        /// Gets the chunk's Z coordinate.
+        get-z: func() -> s32;
+
+        /// Gets the block state ID at the specified position relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        get-block-state-id: func(pos: block-pos) -> u16;
+
+        /// Gets detailed block state information at the specified position relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        get-block-state: func(pos: block-pos) -> block-state;
+
+        /// Sets the block state at the specified position relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        set-block-state: func(pos: block-pos, state: u16);
+
+        /// Gets the biome at the specified position relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        get-biome: func(pos: block-pos) -> biome;
+
+        /// Gets the block entity at the specified position relative to the chunk, if any.
+        /// X and Z must be in the range [0, 15].
+        get-block-entity: func(pos: block-pos) -> option<block-entity-type>;
+
+        /// Gets the highest non-air block Y coordinate at the specified X and Z relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        get-top-block-y: func(x: s32, z: s32) -> s32;
+
+        /// Gets the sky light level at the specified position relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        get-sky-light: func(pos: block-pos) -> u8;
+
+        /// Gets the block light level at the specified position relative to the chunk.
+        /// X and Z must be in the range [0, 15].
+        get-block-light: func(pos: block-pos) -> u8;
+    }
+
+    /// Represents the boundaries of a world.
+    resource world-border {
+        /// Gets the center X coordinate of the border.
+        get-center-x: func() -> f64;
+        /// Gets the center Z coordinate of the border.
+        get-center-z: func() -> f64;
+        /// Sets the center coordinates of the border.
+        set-center: func(x: f64, z: f64);
+
+        /// Gets the current diameter of the border.
+        get-diameter: func() -> f64;
+        /// Sets the diameter of the border, optionally with a speed (in ticks) for lerping.
+        set-diameter: func(diameter: f64, speed: option<u64>);
+
+        /// Gets the distance from the border where warning effects start (in blocks).
+        get-warning-distance: func() -> s32;
+        /// Sets the warning distance (in blocks).
+        set-warning-distance: func(distance: s32);
+
+        /// Gets the time before a player hitting the border is warned (in seconds).
+        get-warning-delay: func() -> s32;
+        /// Sets the warning delay (in seconds).
+        set-warning-delay: func(delay: s32);
+
+        /// Returns whether the specified coordinates are within the border.
+        contains: func(x: f64, z: f64) -> bool;
+    }
+
     /// Represents an axis-aligned bounding box.
     record bounding-box {
         min: position,
@@ -299,6 +370,12 @@ interface %world {
     resource %world {
         /// Returns the unique identifier of this world.
         get-id: func() -> string;
+
+        /// Gets the world border associated with this world.
+        get-world-border: func() -> world-border;
+
+        /// Gets the chunk at the specified chunk coordinates.
+        get-chunk: func(x: s32, z: s32) -> option<chunk>;
 
         /// Gets the block state ID at the specified position.
         get-block-state-id: func(pos: block-pos) -> u16;
@@ -380,6 +457,12 @@ interface %world {
 
         /// Returns a list of all entities in this world.
         get-entities: func() -> list<entity>;
+
+        /// Returns a list of entities within the specified radius of the position.
+        get-entities-in-radius: func(pos: position, radius: f64) -> list<entity>;
+
+        /// Returns the entity with the specified UUID, if it exists in this world.
+        get-entity-by-uuid: func(id: uuid) -> option<entity>;
 
         /// Returns the block entity at the specified position, if any.
         get-block-entity: func(pos: block-pos) -> option<block-entity-type>;
