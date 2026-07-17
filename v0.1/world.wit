@@ -376,6 +376,11 @@ interface %world {
         /// Gets the chunk at the specified chunk coordinates.
         get-chunk: func(x: s32, z: s32) -> option<chunk>;
 
+        /// Generates every chunk in the inclusive region [min, max] (chunk
+        /// coordinates) to full and persists it. Tickets a one-chunk margin so
+        /// cross-border features land before saving. For background pre-generation.
+        pregenerate-region: func(min-x: s32, min-z: s32, max-x: s32, max-z: s32);
+
         /// Gets the block state ID at the specified position.
         get-block-state-id: func(pos: block-pos) -> u16;
 
