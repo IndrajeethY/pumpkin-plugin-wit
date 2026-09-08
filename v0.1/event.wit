@@ -743,6 +743,12 @@ interface event {
     record villager-acquire-trade-event-data {
         entity-id: s32,
         recipe-index: s32,
+        cost-a: item-stack,
+        cost-b: option<item-stack>,
+        output: item-stack,
+        max-uses: s32,
+        xp: s32,
+        price-multiplier: f32,
         cancelled: bool
     }
 
